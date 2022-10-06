@@ -4,20 +4,76 @@ let app=angular.module('myapp',[
 ]);
 
 
+app.filter('offset', function() {
+    return function(input, start) {
+      start = parseInt(start, 10);
+      return input.slice(start);
+    };
+  });
+
+
 app.controller('myctrl',function($scope){
 
     $scope.customers = [];
     let empid = 1;
 
+    // paging
+
+
+    $scope.itemsPerPage = 5;
+    $scope.currentPage = 0;
+
+    $scope.range = function() {
+    let rangeSize = 3;
+    let ret = [];
+    let start = 0;
+
+    start = $scope.currentPage;
+    if ( start > $scope.pageCount()-rangeSize ) {
+        start = $scope.pageCount()-rangeSize+1;
+    }
+
+    for (let i = start; i<start+rangeSize; i++) {
+        ret.push(i);
+    }
+    return ret;
+    };
+
+    $scope.prevPage = function() {
+    if ($scope.currentPage > 0) {
+        $scope.currentPage--;
+    }
+    };
+
+    $scope.prevPageDisabled = function() {
+    return $scope.currentPage === 0 ? "disabled" : "";
+    };
+
+    $scope.pageCount = function() {
+    return Math.ceil($scope.customers.length/$scope.itemsPerPage)-1;
+    };
+
+    $scope.nextPage = function() {
+    if ($scope.currentPage < $scope.pageCount()) {
+        $scope.currentPage++;
+    }
+    };
+
+    $scope.nextPageDisabled = function() {
+    return $scope.currentPage === $scope.pageCount() ? "disabled" : "";
+    };
+
+    $scope.setPage = function(n) {
+    $scope.currentPage = n;
+    };
+
+
+    // paging
+
+
     // insert new customer
 
     $scope.saveRecord = function () {
-
-        if($scope.newCustomer != undefined){
-            if($scope.newCustomer.name == null || $scope.newCustomer.dob == null || $scope.newCustomer.address == null )
-            {   
-                alert('check again');
-            }else{
                 if ($scope.newCustomer.id == null) {
                     $scope.newCustomer.id = empid++;
                     $scope.customers.push($scope.newCustomer);
@@ -38,15 +94,7 @@ app.controller('myctrl',function($scope){
                      
                     $scope.newCustomer = {};
             }
-        }else{
-            alert('check again');
-        }
- 
-       
 
-      
-         
-        }
 
     //  delete customer   
     
@@ -70,10 +118,6 @@ app.controller('myctrl',function($scope){
              
         $scope.edit = function (id) {
 
-            if($scope.newCustomer.name == null || $scope.newCustomer.dob == null || $scope.newCustomer.address == null )
-            {   
-                alert('check again');
-            }else{
                 for (i in $scope.customers) {
              
                                 if ($scope.customers[i].id == id) {
@@ -86,8 +130,6 @@ app.controller('myctrl',function($scope){
             }
              
         
-             
-        }
 
             $scope.curPage = 1,
             $scope.itemsPerPage = 3,

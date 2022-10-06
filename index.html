@@ -6,6 +6,8 @@
       <link rel="stylesheet" href="style.css" />
       <link href="node_modules/angularjs-datepicker/src/css/angular-datepicker.css" rel="stylesheet" type="text/css" />
       <link rel="stylesheet" href="node_modules/bootstrap-icons/font/bootstrap-icons.css">
+
+ 
    </head>
    
    <body>
@@ -32,7 +34,7 @@
                 </div>
                 <div class="col-75">
                     <input type="text" name="custName" ng-model="newCustomer.name" class="form-control" required/>
-                    <span style="color:red" ng-show="custForm.custName.$dirty && custForm.custName.$invalid">
+                    <span style="color:red" ng-show="custForm.custName.$touched && custForm.custName.$invalid ">
                       <span ng-show="custForm.custName.$error.required">Name is required</span>
                   </span>
                 </div>
@@ -50,7 +52,7 @@
                         required
                        />
                     </datepicker>
-                    <span style="color:red" ng-show="custForm.custDob.$dirty && custForm.custDob.$invalid">
+                    <span style="color:red" ng-show="custForm.custDob.$touched && custForm.custDob.$invalid">
                       <span ng-show="custForm.custDob.$error.required">DOB is required</span>
                   </span>
                 
@@ -62,7 +64,7 @@
                 </div>
                 <div class="col-75">
                   <textarea id="subject"  name="custAddress" ng-model="newCustomer.address" class="form-control" style="height:200px" required></textarea>
-                  <span style="color:red" ng-show="custForm.custAddress.$dirty && custForm.custAddress.$invalid">
+                  <span style="color:red" ng-show="custForm.custAddress.$touched && custForm.custAddress.$invalid">
                     <span ng-show="custForm.custAddress.$error.required">Address is required</span>
                 </span>
                 </div>
@@ -74,7 +76,7 @@
                     <input type="hidden" ng-model="newCustomer.id" />
                     
                     <button value="Save" 
-                    ng-disabled="custForm.custName.$dirty && custForm.custName.$invalid || custForm.custDob.$dirty && custForm.custDob.$invalid || custForm.custAddress.$dirty && custForm.custAddress.$invalid"
+                    ng-disabled="custForm.custName.$pristine || custForm.custName.$invalid || custForm.custDob.$pristine || custForm.custDob.$invalid || custForm.custAddress.$pristine || custForm.custAddress.$invalid"
                     ng-click="saveRecord()" 
                     class="btn btn-outline-secondary btn-lg" 
                     style="float: right;">  
@@ -89,22 +91,20 @@
         <!-- form -->
      
    
-   
-         
           <!-- table -->
 
           <div class="container-table table-responsive">
             <table class="table table-hover" id="custData">
                 <thead>
                   <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Address</th>
-                    <th scope="col">DOB</th>
+                    <th  scope="col">Name</th>
+                    <th  scope="col">Address</th>
+                    <th  scope="col">DOB</th>
                     <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr ng-repeat="customer in customers">
+                  <tr ng-repeat="customer in customers | offset: currentPage*itemsPerPage | limitTo: itemsPerPage" >
                     <th scope="row">{{ customer.name }}</th>
                     <td>{{ customer.address }}</td>
                     <td>{{ customer.dob }}</td>
@@ -119,12 +119,35 @@
                     </td>
                   </tr>
                 </tbody>
+                <tfoot>
+
+                  <td colspan="3">
+                    <div class="float-right">
+                      <ul class="pagination">
+                        <li class="page-item" ng-class="prevPageDisabled()">
+                          <a href class="page-link" ng-click="prevPage()">« Prev</a>
+                        </li>
+
+                        <li class="page-item" ng-repeat="n in range()"  ng-if="n > 0"
+                          ng-class="{active: n == currentPage}" ng-click="setPage(n)">
+                          <a href="#" class="page-link"> {{n > 0 ? n : ''}}</a>
+                        </li>
+                        <li class="page-item" ng-class="nextPageDisabled()">
+                          <a href class="page-link" ng-click="nextPage()">Next »</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tfoot>
               </table>
-              <div data-pagination="" data-num-pages="numOfPages()" data-current-page="curPage" data-max-size="maxSize" data-boundary-links="true"></div>
+              </div>
           </div>
 
           <!-- table -->
-     
+          <!-- paging -->
+        
+
+          <!-- paging -->
      
      
         </div>
